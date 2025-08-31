@@ -4,8 +4,8 @@
 #include <stdbool.h>
 
 typedef struct {
-    char ** items;
-    size_t size;
+	char** items;
+	size_t size;
 } tokenlist;
 
 char * get_input(void);
