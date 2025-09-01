@@ -60,6 +60,12 @@ tokenlist *get_tokens(char *input) {
 	return tokens;
 }
 
+void replace_token(tokenlist* tokens, int i, char* item) {
+	free(tokens->items[i]);
+	tokens->items[i] = malloc(sizeof(char*) * (strlen(item) + 1));
+	strcpy(tokens->items[i], item);
+}
+
 void free_tokens(tokenlist *tokens) {
 	for (int i = 0; i < tokens->size; i++)
 		free(tokens->items[i]);

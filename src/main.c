@@ -69,10 +69,6 @@ int main() {
 	bool should_run = true;
 
 	while (should_run) {
-		/*
-
-		*/
-
 		printf("> ");
 
 		/* input contains the whole command
@@ -83,6 +79,7 @@ int main() {
 		printf("whole input: %s\n", input);
 
 		tokenlist *tokens = get_tokens(input);
+
 		for (int i = 0; i < tokens->size; i++) {
 			printf("token %d: (%s)\n", i, tokens->items[i]);
 		}

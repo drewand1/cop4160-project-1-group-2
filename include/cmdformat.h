@@ -39,8 +39,4 @@ void path_search(tokenlist* tokens);
 // but the first a string, separating them by a space.
 char* make_arg_list(tokenlist* tokens);
 
-// Utility function that will help us with the find-and-replace-esque nature of
-// the other functions in cmdformat.h.
-void replace_string(char* orig_str, char* new_str);
-
 #endif
