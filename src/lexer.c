@@ -1,8 +1,13 @@
-
 #include "lexer.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// it'll be alright the c fairy isn't going to haunt my dreams because I used
+// one little macro for an operation that does NOT deserve an entire fn call
+// stack frame
+#define IS_OP(x) (x == '|' || x == '>' || x == '<' || x == '&')
 
 char *get_input(void) {
 	char *buffer = NULL;
@@ -46,6 +51,7 @@ void add_token(tokenlist *tokens, char *item) {
 	tokens->size += 1;
 }
 
+/* EMERGENCY BACKUP LEXER --- DO NOT REMOVE!
 tokenlist *get_tokens(char *input) {
 	char *buf = (char *)malloc(strlen(input) + 1);
 	strcpy(buf, input);
@@ -58,12 +64,77 @@ tokenlist *get_tokens(char *input) {
 	}
 	free(buf);
 	return tokens;
+}*/
+
+tokenlist *get_tokens(char *input) {
+	// This is an attempt at a lexer that separates "operators" like |, >,
+	// <, and & into separate tokens even if they're not separated by space.
+	// UPDATE after not-so-rigorous testing: it succeeds! Just in case, I've
+	// left the old one commented out. This one is kind of quick and dirty
+	// but it works so I'm happy with it if y'all are.
+	char *buf = (char *)malloc(strlen(input) + 1);
+	strcpy(buf, input);
+	tokenlist *tokens = new_tokenlist();
+	
+	int start = 0;
+
+	while (buf[start] != '\0') {
+		while (isspace(buf[start]) && buf[start] != '\0')
+			start++;
+
+		if (buf[start] == '\0')
+			break;
+
+		if (IS_OP(buf[start])) {
+			char tok[2] = {buf[start], '\0'};
+			add_token(tokens, tok);
+			start++;
+		} else {
+			int end = start;
+			char next = buf[end + 1];
+
+			while (!isspace(next) && !IS_OP(next) && next != '\0') {
+				end++;
+				next = buf[end + 1];
+			}
+
+			int sz = end - start + 2;
+			char* tok = (char*) malloc(sizeof(char) * sz);
+
+			for (int i = 0; i < sz - 1; i++)
+				tok[i] = buf[start + i];
+			
+			tok[sz - 1] = '\0';
+
+			add_token(tokens, tok);
+			free(tok);
+			start = end + 1;
+		}
+	}
+
+	free(buf);
+	return tokens;
 }
 
 void replace_token(tokenlist* tokens, int i, char* item) {
+	if (i < 0 || i > tokens->size - 1)
+		return;
+	
 	free(tokens->items[i]);
 	tokens->items[i] = malloc(sizeof(char*) * (strlen(item) + 1));
 	strcpy(tokens->items[i], item);
+}
+
+void remove_token(tokenlist* tokens, int i) {
+	if (i < 0 || i > tokens->size - 1)
+		return;
+
+	free(tokens->items[i]);
+	
+	for (int j = i + 1; j < tokens->size; j++)
+		tokens->items[j - 1] = tokens->items[j];
+	
+	(tokens->size)--;
 }
 
 void free_tokens(tokenlist *tokens) {

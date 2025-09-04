@@ -21,29 +21,24 @@ The command pipeline:
 	4. Expand env vars and tildes.
 	5. Resolve command (will either be a built in fn, relative to
 		pwd or in $PATH; probably best to check in that order).
-	6. Make command line args (all tokens which are not redirects or
-		ampersands in the command)
 
 	[PRE-EXECUTION STAGE]
+	6. Fork
 	7. Resolve stdin; will either be redirect with '<', result of
-		pipe, or default. Not sure what this looks like yet.
+		pipe, or default. If redirect is present, redirect fd.
 	8. Resolve stdout; will either be redirect with '>', result of
-		pipe, or default. Not sure what this looks like yet.
+		pipe, or default. If redirect is present, redirect fd.
 	9. Determine whether background or foreground (based on presence
-		of '&' token).
+		of '&' token). Presumably all that changes is that if it's
+		background we don't call wait?
+	10. Make command line args (all tokens which are not redirects or
+		ampersands in the command; ends with null. Check execv manpage
+		for better explanation).
 
 	[EXECUTION STAGE]
-	10. Execute w/ command line args (this is a ).
+	11. Execute w/ command args
 
 Now there are some holes in that:
-	- I have no clue how we're gonna tackle making programs run in the
-		background, so depening on how that works, that might throw a
-		wrench in it.
-	- I have only the vague-est idea how output redirection works, so same ^
-	- Step 10 (execution) is a big ass process that warrants more
-		elaboration --- something like fork and handle files and execv
-		but I haven't really thought too hard about the nitty-gritty
-		detail of that yet.
 	- We need to identify potential errors --- a LOT of things can go wrong
 		in user input to a shell and we have to catch all of those edge
 		cases and report them.
@@ -57,6 +52,9 @@ space. We have two options:
 		as separate tokens from the text they might prefix/suffix.
 We should make this decision early, because whether we do this will determine
 how we interpret our tokens in our system.
+	UPDATE ON THIS: I went ahead and made the get_tokens function handle
+	"operators" like |, >, <, and & as separate tokens regardless of whether
+	there's a space separating them or not. Better safe than sorry!
 
 */
 

@@ -21,7 +21,7 @@ for execution. E.g. expanding environment variables, splitting by pipes, etc.
 //			token lists; is a result parameter and will be mutated.
 // int* size	:	pointer to variable containing the size of out_toks_arr;
 //			is a result parameter and will be mutated.
-void pipe_split(tokenlist* in_toks, tokenlist* out_toks_arr, int* size);
+void pipe_split(tokenlist* in_toks, tokenlist** out_toks_arr, int* size);
 
 // Frees a list of token lists obtained from pipe_split.
 void free_pipe_split(tokenlist* toks_arr, int size);

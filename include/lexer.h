@@ -13,4 +13,5 @@ tokenlist * get_tokens(char *input);
 tokenlist * new_tokenlist(void);
 void add_token(tokenlist *tokens, char *item);
 void replace_token(tokenlist* tokens, int i, char* item);
+void remove_token(tokenlist* tokens, int i);
 void free_tokens(tokenlist *tokens);
