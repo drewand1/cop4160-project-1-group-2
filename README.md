@@ -85,13 +85,14 @@ This will run the program ...
 ## Development Log
 Each member records their contributions here.
 
-### [Member 1]
+### [Andrew Bradley]
 
-| Date       | Work Completed / Notes |
-|------------|------------------------|
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
+| Date       | Work Completed / Notes                                          |
+|------------|-----------------------------------------------------------------|
+| 2025-08-30 | Preliminary planning                                            |
+| 2025-08-31 | Added replace_token                                             |
+| YYYY-MM-DD | Added remove_token and made lexer treat |, <, >, and & as       |
+|            | separate tokens regardless of spacing.                          |
 
 ### [Member 2]
 
