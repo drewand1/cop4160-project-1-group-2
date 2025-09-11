@@ -62,22 +62,32 @@ how we interpret our tokens in our system.
 #include <stdbool.h>
 #include <string.h>
 #include "cmdformat.h"
+#include "errhandling.h"
 #include "lexer.h"
 
 int main() {
 	bool should_run = true;
 
 	while (should_run) {
-		printf("> ");
+		// PROMPT
+		char* user = getenv("USER");
+		char* machine = getenv("MACHINE");
+		char* pwd = getenv("PWD");
 
-		/* input contains the whole command
-		 * tokens contains substrings from input split by spaces
-		 */
+		assert_exit_ptr(user, "FATAL ERROR: USER environment variable not defined.");
+		assert_exit_ptr(pwd, "FATAL ERROR: PWD environment variable not defined.");
 
+		if (machine)
+			printf("%s@%s:%s> ", user, machine, pwd);
+		else
+			printf("%s:%s> ", user, pwd);
+
+		// GETTING AND PROCESSING INPUT
 		char *input = get_input();
 		printf("whole input: %s\n", input);
 
 		tokenlist* init_tokens = get_tokens(input);
+		expand_env_vars(init_tokens);
 		pipe_chain pc;
 		pipe_split(init_tokens, &pc);
 

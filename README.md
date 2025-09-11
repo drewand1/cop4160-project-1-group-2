@@ -91,9 +91,10 @@ Each member records their contributions here.
 |------------|-----------------------------------------------------------------|
 | 2025-08-30 | Preliminary planning                                            |
 | 2025-08-31 | Added replace_token                                             |
-| 2025-09-03 | Added remove_token and made lexer treat |, <, >, and & as       |
-|            | separate tokens regardless of spacing.                          |
-| 2025-09-10 | Added pipe_split and free_pipe_split fns                        |
+| 2025-09-03 | Added remove_token and made lexer treat |, <, >, and & as separate tokens regardless of spacing.|
+| 2025-09-10 | Added pipe_split and free_pipe_split fns, made shell split command
+up by pipes. Got prompt and environment variable expansion working. Added some
+assert functions for error handling for convenience.|
 
 ### [Member 2]
 

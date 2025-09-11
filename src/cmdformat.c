@@ -37,7 +37,18 @@ void free_pipe_split(pipe_chain* pc) {
 	// free(pc) here.
 }
 
-void expand_env_vars(tokenlist* tokens) {}
+void expand_env_vars(tokenlist* tokens) {
+	for (int i = 0; i < tokens->size; i++) {
+		if (tokens->items[i][0] != '$')
+			continue;
+		
+		char* val = getenv(tokens->items[i] + 1); // token without begining '$'
+		if (!val)
+			val = ""; // My shell seems to replace null vars with a blank str.
+				  // So, I'm gonna do that too.
+		replace_token(tokens, i, val);
+	}
+}
 
 void path_search(tokenlist* tokens) {}
 
