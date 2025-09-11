@@ -42,25 +42,13 @@ Now there are some holes in that:
 	- We need to identify potential errors --- a LOT of things can go wrong
 		in user input to a shell and we have to catch all of those edge
 		cases and report them.
-
-Another note about the lexer --- that was provided to us, but it just splits by
-space. We have two options:
-	1. Pray to God that none of Wang's test commands will throw some
-		curveball shit at us like "p1 > out.txt" vs. "p1 >out.txt"
-		or "p1 | p2" vs. "p1|p2".
-	2. Redesign it to handle that and treat '>', '|' and '&'
-		as separate tokens from the text they might prefix/suffix.
-We should make this decision early, because whether we do this will determine
-how we interpret our tokens in our system.
-	UPDATE ON THIS: I went ahead and made the get_tokens function handle
-	"operators" like |, >, <, and & as separate tokens regardless of whether
-	there's a space separating them or not. Better safe than sorry!
-
 */
 
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "cmdformat.h"
 #include "errhandling.h"
 #include "lexer.h"
@@ -78,13 +66,13 @@ int main() {
 		assert_exit_ptr(pwd, "FATAL ERROR: PWD environment variable not defined.");
 
 		if (machine)
-			printf("%s@%s:%s> ", user, machine, pwd);
+			printf("\e[0;31m%s@%s\e[0m:\e[0;36m%s\e[0m> ", user, machine, pwd);
 		else
-			printf("%s:%s> ", user, pwd);
+			printf("\e[0;31m%s\e[0m:\e[0;36m%s\e[0m> ", user, pwd);
 
 		// GETTING AND PROCESSING INPUT
 		char *input = get_input();
-		printf("whole input: %s\n", input);
+		//printf("whole input: %s\n", input);
 
 		tokenlist* init_tokens = get_tokens(input);
 		expand_env_vars(init_tokens);
@@ -95,12 +83,12 @@ int main() {
 		free(input);
 
 		for (int i = 0; i < pc.size; i++) {
-			printf("[[ CMD %d ]]\n", i);
+			//printf("[[ CMD %d ]]\n", i);
 
 			tokenlist* tokens = pc.cmds[i];			
-			for (int j = 0; j < tokens->size; j++) {
+			/*for (int j = 0; j < tokens->size; j++) {
 				printf("token %d: (%s)\n", j, tokens->items[j]);
-			}
+			}*/
 
 			if (tokens->size == 0)
 				continue;
@@ -108,6 +96,17 @@ int main() {
 			// exit built-in fn
 			if (strcmp(tokens->items[0], "exit") == 0)
 				should_run = false;
+
+			// Running external commands
+			if (fork() == 0) {
+				execv(tokens->items[0], tokens->items);
+				// If anything below execv executes, that means
+				// the program wasn't found. Meaning it's time
+				// for a path search.
+			} else {
+				int status;
+				waitpid(-1, &status, 0);
+			}
 		}
 		
 		free_pipe_split(&pc);

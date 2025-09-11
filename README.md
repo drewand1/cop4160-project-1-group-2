@@ -95,6 +95,7 @@ Each member records their contributions here.
 | 2025-09-10 | Added pipe_split and free_pipe_split fns, made shell split command
 up by pipes. Got prompt and environment variable expansion working. Added some
 assert functions for error handling for convenience.|
+| 2025-09-11 | Made direct-path commands work. Path search still not implemented. Also made the shell have colors!!|
 
 ### [Member 2]
 
