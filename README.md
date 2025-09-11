@@ -91,8 +91,9 @@ Each member records their contributions here.
 |------------|-----------------------------------------------------------------|
 | 2025-08-30 | Preliminary planning                                            |
 | 2025-08-31 | Added replace_token                                             |
-| YYYY-MM-DD | Added remove_token and made lexer treat |, <, >, and & as       |
+| 2025-09-03 | Added remove_token and made lexer treat |, <, >, and & as       |
 |            | separate tokens regardless of spacing.                          |
+| 2025-09-10 | Added pipe_split and free_pipe_split fns                        |
 
 ### [Member 2]
 

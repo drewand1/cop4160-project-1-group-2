@@ -61,6 +61,7 @@ how we interpret our tokens in our system.
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include "cmdformat.h"
 #include "lexer.h"
 
 int main() {
@@ -76,21 +77,30 @@ int main() {
 		char *input = get_input();
 		printf("whole input: %s\n", input);
 
-		tokenlist *tokens = get_tokens(input);
+		tokenlist* init_tokens = get_tokens(input);
+		pipe_chain pc;
+		pipe_split(init_tokens, &pc);
 
-		for (int i = 0; i < tokens->size; i++) {
-			printf("token %d: (%s)\n", i, tokens->items[i]);
-		}
-
-		if (tokens->size == 0)
-			continue;
-
-		// exit built-in fn
-		if (strcmp(tokens->items[0], "exit") == 0)
-			should_run = false;
-
+		free_tokens(init_tokens);
 		free(input);
-		free_tokens(tokens);
+
+		for (int i = 0; i < pc.size; i++) {
+			printf("[[ CMD %d ]]\n", i);
+
+			tokenlist* tokens = pc.cmds[i];			
+			for (int j = 0; j < tokens->size; j++) {
+				printf("token %d: (%s)\n", j, tokens->items[j]);
+			}
+
+			if (tokens->size == 0)
+				continue;
+
+			// exit built-in fn
+			if (strcmp(tokens->items[0], "exit") == 0)
+				should_run = false;
+		}
+		
+		free_pipe_split(&pc);
 	}
 
 	return 0;

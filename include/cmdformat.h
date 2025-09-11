@@ -12,19 +12,25 @@ for execution. E.g. expanding environment variables, splitting by pipes, etc.
 
 #include "lexer.h"
 
+typedef struct {
+	int size;
+	tokenlist** cmds;
+} pipe_chain;
+
 // Takes in a list of tokens obtained by tokenizing direct user input.
 // Splits them into separate sub-token-lists by each pipe ('|') token, such that
 // the token list {"p1", "arg", "|", "p2", "param"} results in the token list
 // array {{"p1", "arg"}, {"p2", "cmd"}}.
 // in_toks	:	pointer to the input token list
-// out_toks_arr	:	pointer to the first element in the array of output
-//			token lists; is a result parameter and will be mutated.
+// out_toks_arr	:	pointer to the first element in the array of pointers to
+//			output token lists; is a result parameter and will be
+//			mutated.
 // int* size	:	pointer to variable containing the size of out_toks_arr;
 //			is a result parameter and will be mutated.
-void pipe_split(tokenlist* in_toks, tokenlist** out_toks_arr, int* size);
+void pipe_split(tokenlist* in_toks, pipe_chain* pc);
 
 // Frees a list of token lists obtained from pipe_split.
-void free_pipe_split(tokenlist* toks_arr, int size);
+void free_pipe_split(pipe_chain* pc);
 
 // Takes in a list of tokens and expands all environment variables (tokens that
 // start with '$').
