@@ -4,44 +4,55 @@
 
 ## Group Members
 - **Andrew Bradley**: aeb23b@fsu.edu
+  **Ryan Kurfirst**:  rsk22a@fsu.edu
+
 ## Division of Labor
 
 ### Part 1: Prompt
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Daniel Halterman
+    Andrew Bradley
 ### Part 2: Environment Variables
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Andrew Bradley
+    Ryan Kurfirst
 ### Part 3: Tilde Expansion
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Ryan Kurfirst
+    Daniel Halterman
 ### Part 4: $PATH Search
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Ryan Kurfirst
+    Daniel Halterman
 ### Part 5: External Command Execution
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Andrew Bradley
+    Ryan Kurfirst
 ### Part 6: I/O Redirection
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Daniel Halterman
+    Andrew Bradley
 ### Part 7: Piping
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Andrew Bradley
+    Ryan Kurfirst
 ### Part 8: Background Processing
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Daniel Halterman 
+    Andrew Bradley
 ### Part 9: Internal Command Execution
 - **Responsibilities**: [Description]
 - **Assigned to**: 
-
+    Ryan Kurfirst
+    Daniel Halterman
 ### Part 10: External Timeout Executable
 - **Responsibilities**: [Description]
 - **Assigned to**: 
@@ -59,7 +70,9 @@ shell/
 │ └── shell.c
 │
 ├── include/
-│ └── shell.h
+│ ├── shell.h
+│ ├── errhandling.h
+│ └── lexer.h
 │
 ├── README.md
 └── Makefile
@@ -97,7 +110,7 @@ up by pipes. Got prompt and environment variable expansion working. Added some
 assert functions for error handling for convenience.|
 | 2025-09-11 | Made direct-path commands work. Path search still not implemented. Also made the shell have colors!!|
 
-### [Member 2]
+### [Ryan Kurfirst]
 
 | Date       | Work Completed / Notes |
 |------------|------------------------|
