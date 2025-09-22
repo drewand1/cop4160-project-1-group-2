@@ -1,6 +1,13 @@
+/*
+
+errhandling.h
+
+Declares some useful error handling fns.
+
+*/
+
 #include <stdio.h>
 #include <stdint.h>
-
 
 // If ptr is null, prints msg to stderr and exits with code -1.
 void assert_exit_ptr(void* ptr, char* msg);

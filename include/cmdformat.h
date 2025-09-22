@@ -43,6 +43,6 @@ void path_search(tokenlist* tokens);
 // Creates an argument list suitable for execv from a token list; that is,
 // strips it of redirect-related tokens and ampersands, and makes all entries
 // but the first a string, separating them by a space.
-char* make_arg_list(tokenlist* tokens);
+char** make_arg_list(tokenlist* tokens);
 
 #endif

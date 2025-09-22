@@ -52,4 +52,18 @@ void expand_env_vars(tokenlist* tokens) {
 
 void path_search(tokenlist* tokens) {}
 
-char* make_arg_list(tokenlist* tokens) {}
+char** make_arg_list(tokenlist* tokens) {
+	for (int i = 0; i < tokens->size; i++) {
+		if (tokens->items[i][0] != '>' && tokens->items[i][0] != '<')
+			continue;
+
+		remove_token(tokens, i);
+
+		if (i + 1 > tokens->size)
+			continue;
+
+		remove_token(tokens, i);
+	}
+
+	return tokens->items;
+}

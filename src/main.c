@@ -109,7 +109,7 @@ int main() {
 			// Running external commands
 			if (fork() == 0) {
 				should_run = false;
-				execv(tokens->items[0], tokens->items);
+				execv(tokens->items[0], make_arg_list(tokens));
 				// If anything below execv executes, that means
 				// the program wasn't found. Meaning it's time
 				// for a path search.

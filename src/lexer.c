@@ -131,7 +131,7 @@ void remove_token(tokenlist* tokens, int i) {
 
 	free(tokens->items[i]);
 	
-	for (int j = i + 1; j < tokens->size; j++)
+	for (int j = i + 1; j <= tokens->size; j++)
 		tokens->items[j - 1] = tokens->items[j];
 	
 	(tokens->size)--;
