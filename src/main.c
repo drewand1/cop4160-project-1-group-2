@@ -80,6 +80,7 @@ int main() {
 
 		tokenlist* init_tokens = get_tokens(input);
 		expand_env_vars(init_tokens);
+		expand_tilde(init_tokens);
 		pipe_chain pc;
 		pipe_split(init_tokens, &pc);
 

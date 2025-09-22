@@ -50,6 +50,18 @@ void expand_env_vars(tokenlist* tokens) {
 	}
 }
 
+void expand_tilde(tokenlist* tokens){
+	for (int i = 0; i < tokens->size; i++) {
+		if (tokens->items[i][0] != '~')
+		continue;
+
+		char* val = getenv("HOME");
+		if (!val)
+			val = "";
+		replace_token(tokens, i, val);
+	}
+}
+
 void path_search(tokenlist* tokens) {}
 
 char* make_arg_list(tokenlist* tokens) {}
