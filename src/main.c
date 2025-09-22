@@ -49,6 +49,7 @@ Now there are some holes in that:
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 #include "cmdformat.h"
 #include "errhandling.h"
 #include "lexer.h"
@@ -104,10 +105,27 @@ int main() {
 
 			// Running external commands
 			if (fork() == 0) {
-				execv(tokens->items[0], tokens->items);
-				// If anything below execv executes, that means
-				// the program wasn't found. Meaning it's time
-				// for a path search.
+				// Add null terminator for execv
+				char** args = malloc((tokens->size + 1) * sizeof(char*));
+				for (int j = 0; j < tokens->size; j++) {
+					args[j] = tokens->items[j];
+				}
+				args[tokens->size] = NULL;
+				
+				// Try to execute directly first
+				execv(tokens->items[0], args);
+				
+				// If that fails, try common paths
+				char full_path[256];
+				snprintf(full_path, sizeof(full_path), "/bin/%s", tokens->items[0]);
+				execv(full_path, args);
+				
+				snprintf(full_path, sizeof(full_path), "/usr/bin/%s", tokens->items[0]);
+				execv(full_path, args);
+				
+				// If we get here, command wasn't found
+				printf("Error: Command not found. %s\n", tokens->items[0]);
+				exit(1);
 			} else {
 				int status;
 				waitpid(-1, &status, 0);
