@@ -1,5 +1,6 @@
 #include "cmdformat.h"
 #include <stdio.h>
+#include <string.h>
 
 #define IS_PIPE(x) (x[0] != '|')
 
@@ -58,7 +59,22 @@ void expand_tilde(tokenlist* tokens){
 		char* val = getenv("HOME");
 		if (!val)
 			val = "";
-		replace_token(tokens, i, val);
+
+		// NOTE: initial version expanded the tilde but replaced the
+		// whole token, chopping off a potential path after the tilde.
+		// The following bit includes it. It's a lil rough but it works.
+		int home_len = strlen(val);
+		int path_len = strlen(tokens->items[i]);
+		int new_len = home_len + path_len;
+		char* new_tok = (char*) malloc(sizeof(char) * (new_len + 1));
+
+		strcpy(new_tok, val);
+
+		if (path_len > 0)
+			strcpy(new_tok + home_len, tokens->items[i] + 1);		
+
+		replace_token(tokens, i, new_tok);
+		free(new_tok);
 	}
 }
 
