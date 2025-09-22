@@ -45,4 +45,8 @@ void path_search(tokenlist* tokens);
 // but the first a string, separating them by a space.
 char* make_arg_list(tokenlist* tokens);
 
+// Takes in list of tokens and, if a token is equal to '~' or begins with '~',
+// Replaces it with contents of $HOME envirnoment variable
+void expand_tilde(tokenlist* tokens);
+
 #endif
