@@ -114,7 +114,6 @@ int main() {
 
 			// Running external commands
 			if (fork() == 0) {
-<<<<<<< HEAD
 				// Add null terminator for execv
 				char** args = malloc((tokens->size + 1) * sizeof(char*));
 				for (int j = 0; j < tokens->size; j++) {
@@ -134,22 +133,12 @@ int main() {
 				execv(full_path, args);
 				
 				// If we get here, command wasn't found
-				printf("Error: Command not found. %s\n", tokens->items[0]);
-				exit(1);
-=======
-				should_run = false;
-				execv(tokens->items[0], make_arg_list(tokens));
-				// If anything below execv executes, that means
-				// the program wasn't found. Meaning it's time
-				// for a path search.
-
-				// And at last, if nothing was found,
 				fprintf(
 					stderr,
 					"\e[41;97mERROR:\e[0m Command \"%s\" not found.\n",
 					tokens->items[0]
 				);
->>>>>>> b85080117f4a4273121b0c111c56cf4f079c1a2f
+				exit(1);
 			} else {
 				int status;
 				waitpid(-1, &status, 0);
