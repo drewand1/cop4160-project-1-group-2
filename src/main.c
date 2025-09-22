@@ -66,8 +66,15 @@ int main() {
 		char pwd_buffer[1024];
 		char* pwd = getcwd(pwd_buffer, sizeof(pwd_buffer));
 
-		assert_exit_ptr(user, "FATAL ERROR: USER environment variable not defined.");
-		assert_exit_ptr(pwd, "FATAL ERROR: PWD environment variable not defined.");
+		assert_exit_ptr(
+			user,
+			"\e[41;97mFATAL ERROR:\e[0m USER environment variable not defined."
+		);
+
+		assert_exit_ptr(
+			pwd,
+			"\e[41;97mFATAL ERROR:\e[0m PWD environment variable not defined."
+		);
 
 		if (machine)
 			printf("\e[0;31m%s@%s\e[0m:\e[0;36m%s\e[0m> ", user, machine, pwd);
@@ -99,15 +106,25 @@ int main() {
 				continue;
 
 			// exit built-in fn
-			if (strcmp(tokens->items[0], "exit") == 0)
+			if (strcmp(tokens->items[0], "exit") == 0) {
 				should_run = false;
+				break;
+			}
 
 			// Running external commands
 			if (fork() == 0) {
-				execv(tokens->items[0], tokens->items);
+				should_run = false;
+				execv(tokens->items[0], make_arg_list(tokens));
 				// If anything below execv executes, that means
 				// the program wasn't found. Meaning it's time
 				// for a path search.
+
+				// And at last, if nothing was found,
+				fprintf(
+					stderr,
+					"\e[41;97mERROR:\e[0m Command \"%s\" not found.\n",
+					tokens->items[0]
+				);
 			} else {
 				int status;
 				waitpid(-1, &status, 0);
