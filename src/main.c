@@ -59,8 +59,12 @@ int main() {
 	while (should_run) {
 		// PROMPT
 		char* user = getenv("USER");
-		char* machine = getenv("MACHINE");
-		char* pwd = getenv("PWD");
+		char* machine = getenv("HOSTNAME");
+		if (!machine) {
+			machine = getenv("MACHINE");
+		}
+		char pwd_buffer[1024];
+		char* pwd = getcwd(pwd_buffer, sizeof(pwd_buffer));
 
 		assert_exit_ptr(user, "FATAL ERROR: USER environment variable not defined.");
 		assert_exit_ptr(pwd, "FATAL ERROR: PWD environment variable not defined.");
