@@ -11,7 +11,7 @@ for execution. E.g. expanding environment variables, splitting by pipes, etc.
 #define CMDFORMAT_H
 
 #include "lexer.h"
-
+#include "unistd.h"
 typedef struct {
 	int size;
 	tokenlist** cmds;

@@ -97,6 +97,10 @@ int main() {
 			// exit built-in fn
 			if (strcmp(tokens->items[0], "exit") == 0)
 				should_run = false;
+				continue; // Continue so we don't perform a path search for exit since it is built in
+
+			// Path search to replace command name with actual path
+			path_search(tokens);
 
 			// Running external commands
 			if (fork() == 0) {

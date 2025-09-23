@@ -67,10 +67,11 @@ shell/
 │
 ├── src/
 │ ├── main.c
-│ └── shell.c
-│
+│ ├── lexer.c
+│ ├── errhandling.c
+│ └── cmdformat.c
 ├── include/
-│ ├── shell.h
+│ ├── commandformat.h
 │ ├── errhandling.h
 │ └── lexer.h
 │
@@ -114,7 +115,7 @@ assert functions for error handling for convenience.|
 
 | Date       | Work Completed / Notes |
 |------------|------------------------|
-| YYYY-MM-DD | [Description of task]  |
+| 2025-09-22 | Added tilde expansion and $PATH search  |
 | YYYY-MM-DD | [Description of task]  |
 | YYYY-MM-DD | [Description of task]  |
 
