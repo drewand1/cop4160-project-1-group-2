@@ -49,6 +49,7 @@ Now there are some holes in that:
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 #include "cmdformat.h"
 #include "errhandling.h"
 #include "lexer.h"
@@ -59,11 +60,22 @@ int main() {
 	while (should_run) {
 		// PROMPT
 		char* user = getenv("USER");
-		char* machine = getenv("MACHINE");
-		char* pwd = getenv("PWD");
+		char* machine = getenv("HOSTNAME");
+		if (!machine) {
+			machine = getenv("MACHINE");
+		}
+		char pwd_buffer[1024];
+		char* pwd = getcwd(pwd_buffer, sizeof(pwd_buffer));
 
-		assert_exit_ptr(user, "FATAL ERROR: USER environment variable not defined.");
-		assert_exit_ptr(pwd, "FATAL ERROR: PWD environment variable not defined.");
+		assert_exit_ptr(
+			user,
+			"\e[41;97mFATAL ERROR:\e[0m USER environment variable not defined."
+		);
+
+		assert_exit_ptr(
+			pwd,
+			"\e[41;97mFATAL ERROR:\e[0m PWD environment variable not defined."
+		);
 
 		if (machine)
 			printf("\e[0;31m%s@%s\e[0m:\e[0;36m%s\e[0m> ", user, machine, pwd);
@@ -95,7 +107,7 @@ int main() {
 				continue;
 
 			// exit built-in fn
-			if (strcmp(tokens->items[0], "exit") == 0)
+			if (strcmp(tokens->items[0], "exit") == 0) {
 				should_run = false;
 				continue; // Continue so we don't perform a path search for exit since it is built in
 
@@ -104,10 +116,31 @@ int main() {
 
 			// Running external commands
 			if (fork() == 0) {
-				execv(tokens->items[0], tokens->items);
-				// If anything below execv executes, that means
-				// the program wasn't found. Meaning it's time
-				// for a path search.
+				// Add null terminator for execv
+				char** args = malloc((tokens->size + 1) * sizeof(char*));
+				for (int j = 0; j < tokens->size; j++) {
+					args[j] = tokens->items[j];
+				}
+				args[tokens->size] = NULL;
+				
+				// Try to execute directly first
+				execv(tokens->items[0], args);
+				
+				// If that fails, try common paths
+				char full_path[256];
+				snprintf(full_path, sizeof(full_path), "/bin/%s", tokens->items[0]);
+				execv(full_path, args);
+				
+				snprintf(full_path, sizeof(full_path), "/usr/bin/%s", tokens->items[0]);
+				execv(full_path, args);
+				
+				// If we get here, command wasn't found
+				fprintf(
+					stderr,
+					"\e[41;97mERROR:\e[0m Command \"%s\" not found.\n",
+					tokens->items[0]
+				);
+				exit(1);
 			} else {
 				int status;
 				waitpid(-1, &status, 0);
