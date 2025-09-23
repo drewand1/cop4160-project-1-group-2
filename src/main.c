@@ -109,41 +109,21 @@ int main() {
 			// exit built-in fn
 			if (strcmp(tokens->items[0], "exit") == 0) {
 				should_run = false;
-				continue; // Continue so we don't perform a path search for exit since it is built in
-
+				break; 
+			}
 			// Path search to replace command name with actual path
 			path_search(tokens);
 
 			// Running external commands
 			if (fork() == 0) {
-				// Add null terminator for execv
-				char** args = malloc((tokens->size + 1) * sizeof(char*));
-				for (int j = 0; j < tokens->size; j++) {
-					args[j] = tokens->items[j];
-				}
-				args[tokens->size] = NULL;
-				
-				// Try to execute directly first
-				execv(tokens->items[0], args);
-				
-				// If that fails, try common paths
-				char full_path[256];
-				snprintf(full_path, sizeof(full_path), "/bin/%s", tokens->items[0]);
-				execv(full_path, args);
-				
-				snprintf(full_path, sizeof(full_path), "/usr/bin/%s", tokens->items[0]);
-				execv(full_path, args);
-				
-				// If we get here, command wasn't found
-				fprintf(
-					stderr,
-					"\e[41;97mERROR:\e[0m Command \"%s\" not found.\n",
-					tokens->items[0]
-				);
-				exit(1);
-			} else {
-				int status;
-				waitpid(-1, &status, 0);
+    		execv(tokens->items[0], tokens->items);
+    		perror("execv failed");
+   			 exit(1);
+			} 
+			
+			else {
+    			int status;
+    			waitpid(-1, &status, 0);
 			}
 		}
 		
