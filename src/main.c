@@ -112,7 +112,10 @@ int main() {
 				break; 
 			}
 			// Path search to replace command name with actual path
-			path_search(tokens);
+			if (path_search(tokens) == -1) {
+				// Command not found, skip this command
+				continue;
+			}
 
 			// Running external commands
 			if (fork() == 0) {

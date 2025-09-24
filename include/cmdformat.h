@@ -38,7 +38,7 @@ void expand_env_vars(tokenlist* tokens);
 
 // Takes in a list of tokens and, if the first one does not begin with ".",
 // replaces it with the full path to the command.
-void path_search(tokenlist* tokens);
+int path_search(tokenlist* tokens);
 
 // Creates an argument list suitable for execv from a token list; that is,
 // strips it of redirect-related tokens and ampersands, and makes all entries

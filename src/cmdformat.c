@@ -97,72 +97,66 @@ void expand_tilde(tokenlist* tokens){
 	}
 }
 
-void path_search(tokenlist* tokens) {
-	// Return early if first already has path to command
-	if(strchr(tokens->items[0], '/') != NULL)
-	return;
+int path_search(tokenlist* tokens) {
+    // Return early if first already has path to command
+    if (strchr(tokens->items[0], '/') != NULL)
+        return 0; // Success - has path
 
-	char* command_token = tokens->items[0];
-	unsigned int num_paths = 0;
-	char** paths;
-	char* path_token;
-	char* path_str = getenv("PATH");
-	assert_exit_ptr(path_str, "FATAL ERROR: PATH environment variable not defined.");
+    char* command_token = tokens->items[0];
+    unsigned int num_paths = 0;
+    char** paths;
+    char* path_token;
+    char* path_str = getenv("PATH");
+    assert_exit_ptr(path_str, "FATAL ERROR: PATH environment variable not defined.");
 
-	char* path_copy = strdup(path_str); // Copy path so strtok doesnt modify the user's original path
+    char* path_copy = strdup(path_str); // Copy path so strtok doesn't modify original
 
-	// First pass to get number of paths
-	path_token = strtok(path_copy,":");
-	while(path_token != NULL){
-		num_paths++;
-		path_token = strtok(NULL, ":");
-	}
+    // First pass to get number of paths
+    path_token = strtok(path_copy, ":");
+    while (path_token != NULL) {
+        num_paths++;
+        path_token = strtok(NULL, ":");
+    }
 
-	free(path_copy);
+    free(path_copy);
 
-	// Second pass to store tokens in str array
-	paths = malloc(num_paths * sizeof(char*));
+    // Second pass to store tokens in array
+    paths = malloc(num_paths * sizeof(char*));
+    path_copy = strdup(path_str);
+    path_token = strtok(path_copy, ":");
+    int i = 0;
 
-	path_copy = strdup(path_str);
-	path_token = strtok(path_copy, ":");
-	int i = 0;
+    while (path_token != NULL) {
+        paths[i] = strdup(path_token);
+        i++;
+        path_token = strtok(NULL, ":");
+    }
 
-	while(path_token != NULL){
-		paths[i] = strdup(path_token);
-		i++;
-		path_token = strtok(NULL, ":");
-	}
+    free(path_copy);
 
-	free(path_copy);
+    // Search for executable in paths
+    for (int j = 0; j < num_paths; j++) {
+        int path_len = strlen(paths[j]) + strlen(command_token) + 2;
+        char* full_path = malloc(path_len);
+        snprintf(full_path, path_len, "%s/%s", paths[j], command_token);
 
-	// Now we have paths array containing pointers to the individual path strings 
-
-	for(int j = 0; j < num_paths; j++){
-		int path_len = strlen(paths[j]) + strlen(command_token) + 2;
-		char* full_path = malloc(path_len);
-		snprintf(full_path, path_len, "%s/%s", paths[j], command_token);  
-
-		// Check if there is a binary found on potential path
-		if (access(full_path, X_OK) == 0){
-
-			free(tokens->items[0]);
-
-			// Set command token to full path string
-			tokens->items[0] = full_path;
-			for(int k = 0; k < num_paths; k++) free(paths[k]);
+        // Check if binary exists and is executable
+        if (access(full_path, X_OK) == 0) {
+            free(tokens->items[0]);
+            tokens->items[0] = full_path; // Set command to full path
+            for (int k = 0; k < num_paths; k++) free(paths[k]);
             free(paths);
-			return;
-		}
-		free(full_path);
-	}
+            return 0; // Success
+        }
+        free(full_path);
+    }
 
-	// If path was never found print error and clear allocations
-	printf("Command not found: %s\n", command_token);
-	for(int k = 0; k < num_paths; k++) free(paths[k]);
+    // Command not found
+    printf("Command not found: %s\n", command_token);
+    for (int k = 0; k < num_paths; k++) free(paths[k]);
     free(paths);
-
-	
-}
+    return -1; // Failure
+} 
 
 char** make_arg_list(tokenlist* tokens) {
 	for (int i = 0; i < tokens->size; i++) {
