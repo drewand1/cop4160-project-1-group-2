@@ -37,10 +37,22 @@ void pipe_split(tokenlist* in_toks, pipe_chain* pc) {
 }
 
 void free_pipe_split(pipe_chain* pc) {
-	for (int i = 0; i < pc->size; i++)
-		free_tokens(pc->cmds[i]);
-	// pc is not necessarily dynamically allocated so we wouldn't call
-	// free(pc) here.
+    if (!pc)
+        return;
+    
+    if (pc->cmds) {
+		// Free each command's tokens
+        for (int i = 0; i < pc->size; i++) {
+            if (pc->cmds[i])
+                free_tokens(pc->cmds[i]);
+        }
+		// Free cmds array
+        free(pc->cmds);
+    }
+    
+	// Make cmds NULL and reset the size to 0
+    pc->cmds = NULL;
+    pc->size = 0;
 }
 
 void expand_env_vars(tokenlist* tokens) {
