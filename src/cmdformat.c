@@ -151,21 +151,12 @@ int path_search(tokenlist* tokens) {
         free(full_path);
     }
 
-<<<<<<< HEAD
     // Command not found
     printf("Command not found: %s\n", command_token);
     for (int k = 0; k < num_paths; k++) free(paths[k]);
     free(paths);
     return -1; // Failure
 } 
-=======
-	// If path was never found print error and clear allocations
-	for(int k = 0; k < num_paths; k++) free(paths[k]);
-	free(paths);
-
-	
-}
->>>>>>> 8bfd1d2ccd2d6816a447c3ee92e9baaf597862d5
 
 char** make_arg_list(tokenlist* tokens) {
 	for (int i = 0; i < tokens->size; i++) {
