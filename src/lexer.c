@@ -117,12 +117,13 @@ tokenlist *get_tokens(char *input) {
 }
 
 void replace_token(tokenlist* tokens, int i, char* item) {
-	if (i < 0 || i > tokens->size - 1)
-		return;
-	
-	free(tokens->items[i]);
-	tokens->items[i] = malloc(sizeof(char*) * (strlen(item) + 1));
-	strcpy(tokens->items[i], item);
+    if (i < 0 || i >= (int)tokens->size)
+        return;
+    
+    free(tokens->items[i]);
+    tokens->items[i] = malloc(strlen(item) + 1);
+    assert_exit_ptr(tokens->items[i], "FATAL ERROR: malloc failed in replace_token");
+    strcpy(tokens->items[i], item);
 }
 
 void remove_token(tokenlist* tokens, int i) {
