@@ -143,9 +143,8 @@ void path_search(tokenlist* tokens) {
 	}
 
 	// If path was never found print error and clear allocations
-	printf("Command not found: %s\n", command_token);
 	for(int k = 0; k < num_paths; k++) free(paths[k]);
-    free(paths);
+	free(paths);
 
 	
 }

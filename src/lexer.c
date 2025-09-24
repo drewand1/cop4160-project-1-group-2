@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "errhandling.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
