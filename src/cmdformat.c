@@ -84,10 +84,12 @@ void expand_tilde(tokenlist* tokens){
 		int path_len = strlen(tokens->items[i]);
 		int new_len = home_len + path_len;
 		char* new_tok = (char*) malloc(sizeof(char) * (new_len + 1));
+		// safety check that prevents your shell from crashing if memory allocation fails
+		assert_exit_ptr(new_tok, "FATAL ERROR: malloc failed in expand_tilde");
 
 		strcpy(new_tok, val);
 
-		if (path_len > 0)
+		if (path_len > 1) // Works only if there's something after the '~'
 			strcpy(new_tok + home_len, tokens->items[i] + 1);		
 
 		replace_token(tokens, i, new_tok);
