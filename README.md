@@ -110,6 +110,8 @@ Each member records their contributions here.
 up by pipes. Got prompt and environment variable expansion working. Added some
 assert functions for error handling for convenience.|
 | 2025-09-11 | Made direct-path commands work. Path search still not implemented. Also made the shell have colors!!|
+| 2025-09-22 | Miscellaneous fix-ups. |
+| 2025-09-24 | Made IO redirection. Fun fact: this change was pushed using our shell. 😎 |
 
 ### [Ryan Kurfirst]
 

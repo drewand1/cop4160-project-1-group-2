@@ -53,6 +53,7 @@ Now there are some holes in that:
 #include "cmdformat.h"
 #include "errhandling.h"
 #include "lexer.h"
+#include "ioredir.h"
 
 int main() {
 	bool should_run = true;
@@ -69,12 +70,12 @@ int main() {
 
 		assert_exit_ptr(
 			user,
-			"\e[41;97mFATAL ERROR:\e[0m USER environment variable not defined."
+			"\e[41;97mFATAL ERROR:\e[0m USER environment variable not defined.\n"
 		);
 
 		assert_exit_ptr(
 			pwd,
-			"\e[41;97mFATAL ERROR:\e[0m PWD environment variable not defined."
+			"\e[41;97mFATAL ERROR:\e[0m PWD environment variable not defined.\n"
 		);
 
 		if (machine)
@@ -119,14 +120,19 @@ int main() {
 
 			// Running external commands
 			if (fork() == 0) {
-    		execv(tokens->items[0], tokens->items);
-    		perror("execv failed");
-   			 exit(1);
-			} 
-			
-			else {
-    			int status;
-    			waitpid(-1, &status, 0);
+				redir_result rd_res = redir_io(tokens);
+				handle_redir_err(rd_res);
+
+    				execv(tokens->items[0], make_arg_list(tokens));
+    				fprintf(
+					stderr,
+					"\e[41;97mERROR:\e[0m command \"%s\" not found.\n",
+					tokens->items[0]
+				);
+   				exit(1);
+			} else {
+    				int status;
+    				waitpid(-1, &status, 0);
 			}
 		}
 		
