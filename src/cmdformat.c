@@ -37,10 +37,22 @@ void pipe_split(tokenlist* in_toks, pipe_chain* pc) {
 }
 
 void free_pipe_split(pipe_chain* pc) {
-	for (int i = 0; i < pc->size; i++)
-		free_tokens(pc->cmds[i]);
-	// pc is not necessarily dynamically allocated so we wouldn't call
-	// free(pc) here.
+    if (!pc)
+        return;
+    
+    if (pc->cmds) {
+		// Free each command's tokens
+        for (int i = 0; i < pc->size; i++) {
+            if (pc->cmds[i])
+                free_tokens(pc->cmds[i]);
+        }
+		// Free cmds array
+        free(pc->cmds);
+    }
+    
+	// Make cmds NULL and reset the size to 0
+    pc->cmds = NULL;
+    pc->size = 0;
 }
 
 void expand_env_vars(tokenlist* tokens) {
@@ -72,10 +84,12 @@ void expand_tilde(tokenlist* tokens){
 		int path_len = strlen(tokens->items[i]);
 		int new_len = home_len + path_len;
 		char* new_tok = (char*) malloc(sizeof(char) * (new_len + 1));
+		// safety check that prevents your shell from crashing if memory allocation fails
+		assert_exit_ptr(new_tok, "FATAL ERROR: malloc failed in expand_tilde");
 
 		strcpy(new_tok, val);
 
-		if (path_len > 0)
+		if (path_len > 1) // Works only if there's something after the '~'
 			strcpy(new_tok + home_len, tokens->items[i] + 1);		
 
 		replace_token(tokens, i, new_tok);

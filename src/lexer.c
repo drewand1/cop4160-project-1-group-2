@@ -118,10 +118,12 @@ tokenlist *get_tokens(char *input) {
 }
 
 void replace_token(tokenlist* tokens, int i, char* item) {
+	// Checks if the index is valid
     if (i < 0 || i >= (int)tokens->size)
         return;
     
     free(tokens->items[i]);
+	// Allocates memory for the new token
     tokens->items[i] = malloc(strlen(item) + 1);
     assert_exit_ptr(tokens->items[i], "FATAL ERROR: malloc failed in replace_token");
     strcpy(tokens->items[i], item);
