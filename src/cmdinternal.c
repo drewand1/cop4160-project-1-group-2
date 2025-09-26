@@ -80,5 +80,13 @@ void handle_shell_exit(){
             printf("%zu: %s\n", i + 1, previous_cmds.items[i]);
         }
     }
-    return;
+
+    for(size_t i = 0; i < previous_cmds.size; i++) {
+        free(previous_cmds.items[i]);  // Free each string
+    }
+    free(previous_cmds.items);  // Free the array of pointers
+    
+    exit(0);  // Actually exit the program
 }
+
+ 
