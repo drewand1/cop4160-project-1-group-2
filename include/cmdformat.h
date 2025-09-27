@@ -46,7 +46,11 @@ int path_search(tokenlist* tokens);
 char** make_arg_list(tokenlist* tokens);
 
 // Takes in list of tokens and, if a token is equal to '~' or begins with '~',
-// Replaces it with contents of $HOME envirnoment variable
+// Replaces it with contents of $HOME environment variable
 void expand_tilde(tokenlist* tokens);
+
+// This is the the argument list to free; all strings in the array
+// as well as the array itself will be deallocated.
+void free_arg_list(char** arg_list);
 
 #endif
