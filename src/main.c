@@ -171,8 +171,8 @@ int main() {
 					// can take input and output redir respectively
 					handle_redir_err(redir_io(tokens));
 				
-    				execv(tokens->items[0], make_arg_list(tokens));
-
+					char** args = make_arg_list(tokens);
+					execv(tokens->items[0], args);
     				fprintf(
 					stderr,
 					"\e[41;97mERROR:\e[0m command \"%s\" not found.\n",
