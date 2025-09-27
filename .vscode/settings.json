@@ -2,6 +2,7 @@
 	"files.associations": {
 		"stdio.h": "c",
 		"errhandling.h": "c",
-		"stdint.h": "c"
+		"stdint.h": "c",
+		"lexer.h": "c"
 	}
 }

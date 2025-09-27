@@ -96,6 +96,10 @@ int main() {
 		free_tokens(init_tokens);
 		free(input);
 
+		bool is_piped = pc.size > 1;
+		int old_pipe[2];
+		int new_pipe[2];
+
 		for (int i = 0; i < pc.size; i++) {
 			//printf("[[ CMD %d ]]\n", i);
 
@@ -115,12 +119,37 @@ int main() {
 			// Path search to replace command name with actual path
 			path_search(tokens);
 
+			// Making pipes
+			if (is_piped) { // no new pipe on last cmd.
+				old_pipe[0] = new_pipe[0];
+				old_pipe[1] = new_pipe[1];
+
+				if (i < pc.size - 1) {
+				int res = pipe(new_pipe);
+
+					if (res == -1) { // holy nesting
+						fprintf(
+							stderr,
+							"\e[41;97mERROR:\e[0m failed to pipe.\n"
+						);
+
+						break;
+					}
+				}
+			}
+
 			// Running external commands
 			if (fork() == 0) {
-				redir_result rd_res = redir_io(tokens);
-				handle_redir_err(rd_res);
-
+				if (is_piped)
+					redir_pipes(i, pc.size, old_pipe, new_pipe);
+				
+				if (!is_piped || i == pc.size - 1 || i == 0)
+					// bc first and last in pipe chain
+					// can take input and output redir respectively
+					handle_redir_err(redir_io(tokens));
+				
     				execv(tokens->items[0], make_arg_list(tokens));
+
     				fprintf(
 					stderr,
 					"\e[41;97mERROR:\e[0m command \"%s\" not found.\n",

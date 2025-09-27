@@ -9,6 +9,12 @@
 #include <stdio.h>
 #include "ioredir.h"
 
+void qdup(int old_fd, int new_fd) {
+	close(old_fd);
+	dup(new_fd);
+	close(new_fd);
+}
+
 redir_result redir_io(tokenlist* tokens) {
 	for (int i = 0; i < tokens->size; i++) {
 		char c = tokens->items[i][0];
@@ -26,13 +32,19 @@ redir_result redir_io(tokenlist* tokens) {
 			if (fd == -1)
 				return OPEN_FAIL;
 
-			close((is_in) ? STDIN_FD : STDOUT_FD);
-			dup(fd);
-			close(fd);
+			qdup((is_in) ? STDIN_FD : STDOUT_FD, fd);
 		}
 	}
 
 	return SUCCESS;
+}
+
+void redir_pipes(int i, int pc_size, int old_pipe[2], int new_pipe[2]) {
+	if (i != 0)
+		qdup(STDIN_FD, old_pipe[0]);
+
+	if (i < pc_size - 1)
+		qdup(STDOUT_FD, new_pipe[1]);
 }
 
 void handle_redir_err(redir_result res) {

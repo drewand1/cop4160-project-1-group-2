@@ -112,6 +112,7 @@ assert functions for error handling for convenience.|
 | 2025-09-11 | Made direct-path commands work. Path search still not implemented. Also made the shell have colors!!|
 | 2025-09-22 | Miscellaneous fix-ups. |
 | 2025-09-24 | Made IO redirection. Fun fact: this change was pushed using our shell. 😎 |
+| 2025-09-26 | Made pipes. |
 
 ### [Ryan Kurfirst]
 
@@ -142,14 +143,14 @@ Document in-person meetings, their purpose, and what was discussed.
 
 
 ## Bugs
-- **Bug 1**: This is bug 1.
+- **Errors In Pipes**: Unexpected behavior happens when a command in a pipe chain errors.
 - **Bug 2**: This is bug 2.
 - **Bug 3**: This is bug 3.
 
 ## Extra Credit
-- **Extra Credit 1**: [Extra Credit Option]
-- **Extra Credit 2**: [Extra Credit Option]
-- **Extra Credit 3**: [Extra Credit Option]
+- **Extra Credit 1**: Unlimited pipes - this shell supports an unlimited number of pipes in one command.
+- **Extra Credit 2**: Shell-ception - you can execute this shell using this shell as many times as you want.
+- **Extra Credit 3**: Piping and I/O redirection - you can redirect input on the first command and redirect output on the last command in a pipe chain. This shell does not, however, support I/O redirection on commands that are not either the first or last in the pipe chain.
 
 ## Considerations
 [Description]
