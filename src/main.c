@@ -52,6 +52,7 @@ Now there are some holes in that:
 #include <stdlib.h>
 #include "cmdformat.h"
 #include "errhandling.h"
+#include "cmdinternal.h"
 #include "lexer.h"
 #include "ioredir.h"
 
@@ -83,10 +84,13 @@ int main() {
 		else
 			printf("\e[0;31m%s\e[0m:\e[0;36m%s\e[0m> ", user, pwd);
 
+		
+		
 		// GETTING AND PROCESSING INPUT
 		char *input = get_input();
 		//printf("whole input: %s\n", input);
 
+		
 		tokenlist* init_tokens = get_tokens(input);
 		expand_env_vars(init_tokens);
 		expand_tilde(init_tokens);
@@ -110,14 +114,33 @@ int main() {
 
 			if (tokens->size == 0)
 				continue;
+			
+			// cd built-in fn
+			if(strcmp(tokens->items[0], "cd") == 0) {
+				change_directory(tokens);
+
+			char* full_cmd = reconstruct_command(tokens);
+        	if (full_cmd) {
+            add_prev_cmd(full_cmd);
+            free(full_cmd);  // Don't forget to free!
+        }
+
+				break;
+			}
 
 			// exit built-in fn
 			if (strcmp(tokens->items[0], "exit") == 0) {
+
+				handle_shell_exit();
 				should_run = false;
+				
 				break; 
 			}
 			// Path search to replace command name with actual path
-			path_search(tokens);
+			if (path_search(tokens) == -1) {
+				// Command not found, skip this command
+				continue;
+			}
 
 			// Making pipes
 			if (is_piped) { // no new pipe on last cmd.
@@ -159,9 +182,16 @@ int main() {
 			} else {
     				int status;
     				waitpid(-1, &status, 0);
+
+					if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            			char* full_cmd = reconstruct_command(tokens);
+            			if (full_cmd) {
+                			add_prev_cmd(full_cmd);
+                			free(full_cmd);
+						}
+					}
+				}
 			}
-		}
-		
 		free_pipe_split(&pc);
 	}
 
