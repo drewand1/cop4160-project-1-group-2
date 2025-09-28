@@ -104,6 +104,8 @@ int main() {
 		int old_pipe[2];
 		int new_pipe[2];
 
+		bool is_bg = pc_contains(&pc, "&");
+
 		for (int i = 0; i < pc.size; i++) {
 			//printf("[[ CMD %d ]]\n", i);
 
@@ -119,11 +121,11 @@ int main() {
 			if(strcmp(tokens->items[0], "cd") == 0) {
 				change_directory(tokens);
 
-			char* full_cmd = reconstruct_command(tokens);
-        	if (full_cmd) {
-            add_prev_cmd(full_cmd);
-            free(full_cmd);  // Don't forget to free!
-        }
+				char* full_cmd = reconstruct_command(tokens);
+        			if (full_cmd) {
+         				add_prev_cmd(full_cmd);
+           				free(full_cmd);  // Don't forget to free!
+				}
 
 				break;
 			}
@@ -181,17 +183,17 @@ int main() {
    				exit(1);
 			} else {
     				int status;
-    				waitpid(-1, &status, 0);
+    				waitpid(-1, &status, (is_bg) ? WNOHANG : 0);
 
-					if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-            			char* full_cmd = reconstruct_command(tokens);
-            			if (full_cmd) {
-                			add_prev_cmd(full_cmd);
-                			free(full_cmd);
-						}
+				if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            				char* full_cmd = reconstruct_command(tokens);
+            				if (full_cmd) {
+                				add_prev_cmd(full_cmd);
+                				free(full_cmd);
 					}
 				}
 			}
+		}
 		free_pipe_split(&pc);
 	}
 

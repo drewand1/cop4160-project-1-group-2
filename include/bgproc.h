@@ -1,0 +1,8 @@
+/*
+
+bgproc.h
+
+This file declares some functions that are useful for handling background
+processes.
+
+*/

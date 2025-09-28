@@ -173,3 +173,19 @@ char** make_arg_list(tokenlist* tokens) {
 
 	return tokens->items;
 }
+
+bool tklist_contains(tokenlist* toks, char* tok) {
+	for (int i = 0; i < toks->size; i++)
+		if (strcmp(toks->items[i], tok) == 0)
+			return true;
+
+	return false;
+}
+
+bool pc_contains(pipe_chain* pc, char* tok) {
+	for (int i = 0; i < pc->size; i++)
+		if (tklist_contains(pc->cmds[i], tok))
+			return true;
+	
+	return false;
+}

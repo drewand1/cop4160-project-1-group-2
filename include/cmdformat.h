@@ -10,8 +10,10 @@ for execution. E.g. expanding environment variables, splitting by pipes, etc.
 #ifndef CMDFORMAT_H
 #define CMDFORMAT_H
 
+#include <stdbool.h>
 #include "lexer.h"
 #include "unistd.h"
+
 typedef struct {
 	int size;
 	tokenlist** cmds;
@@ -48,5 +50,11 @@ char** make_arg_list(tokenlist* tokens);
 // Takes in list of tokens and, if a token is equal to '~' or begins with '~',
 // Replaces it with contents of $HOME envirnoment variable
 void expand_tilde(tokenlist* tokens);
+
+// Returns true if token list contains the given token.
+bool tklist_contains(tokenlist* toks, char* tok);
+
+// Returns true if a pipe chain contains the given token.
+bool pc_contains(pipe_chain* pc, char* tok);
 
 #endif
