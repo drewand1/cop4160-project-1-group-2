@@ -158,20 +158,65 @@ int path_search(tokenlist* tokens) {
     return -1; // Failure
 } 
 
+
+// Makes a list of arguments to use with execv from a list of tokens.
+// It skips special symbols like >, <, and &.
+// Tokens : the list of words typed by the user
+// Returns : a new array of strings ready for execv
 char** make_arg_list(tokenlist* tokens) {
-	for (int i = 0; i < tokens->size; i++) {
-		if (tokens->items[i][0] != '>' && tokens->items[i][0] != '<')
-			continue;
+    // Count how many tokens we'll keep (excluding redirection operators and files)
+    int arg_count = 0;
+    for (int i = 0; i < tokens->size; i++) {
+        char* token = tokens->items[i];
+        if (token[0] == '>' || token[0] == '<') {
+            i++;
+            continue;
+        }
+        
+        // Skip & for background processes
+        if (token[0] == '&') {
+            continue;
+        }
+        
+        arg_count++;
+    }
+    
+    // Create null-terminated array for execv
+    char** arg_list = (char**) malloc((arg_count + 1) * sizeof(char*));
+    
+    // Fill the argument list
+    int arg_index = 0;
+    for (int i = 0; i < tokens->size; i++) {
+        char* token = tokens->items[i];
+        
+        // Skip redirection operators and their arguments
+        if (token[0] == '>' || token[0] == '<') {
+            i++; // Skip the next token (the filename) as well
+            continue;
+        }
+        
+        // Skip & for background processes
+        if (token[0] == '&') {
+            continue;
+        }
+        
+        // Copy the token to the argument list
+        arg_list[arg_index] = strdup(token);
+        arg_index++;
+    }
+    
+    arg_list[arg_count] = NULL;
+    return arg_list;
+}
 
-		remove_token(tokens, i);
-
-		if (i + 1 > tokens->size)
-			continue;
-
-		remove_token(tokens, i);
-	}
-
-	return tokens->items;
+// Helper function to free the argument list created by make_arg_list
+void free_arg_list(char** arg_list) {
+    if (!arg_list) return;
+    
+    for (int i = 0; arg_list[i] != NULL; i++) {
+        free(arg_list[i]);
+    }
+    free(arg_list);
 }
 
 bool tklist_contains(tokenlist* toks, char* tok) {
