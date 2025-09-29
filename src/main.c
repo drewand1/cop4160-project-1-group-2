@@ -55,11 +55,36 @@ Now there are some holes in that:
 #include "cmdinternal.h"
 #include "lexer.h"
 #include "ioredir.h"
+#include "bgproc.h"
 
 int main() {
 	bool should_run = true;
+	unsigned int current_jid = 0;
+	job_list jobs;
+	init_job_list(&jobs);
 
 	while (should_run) {
+		// Background processing checks
+		if (jobs.size > 0) {
+			for (int j = 0; j < jobs.size; j++) {
+				job* jb = jobs.items[j];
+				int status;
+
+				if (waitpid(jb->pid, &status, WNOHANG)) {
+					printf("[%d] + done %s\n", jb->job_id, jb->cmd);
+
+					if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+   						char* full_cmd = jb->cmd;
+            					if (full_cmd)
+                					add_prev_cmd(full_cmd);
+					}
+
+					remove_job(&jobs, j);
+					j--; // So that we don't skip one after removal.
+				}
+			}
+		}
+
 		// PROMPT
 		char* user = getenv("USER");
 		char* machine = getenv("HOSTNAME");
@@ -98,24 +123,18 @@ int main() {
 		pipe_split(init_tokens, &pc);
 
 		free_tokens(init_tokens);
-		free(input);
 
 		bool is_piped = pc.size > 1;
 		int old_pipe[2];
 		int new_pipe[2];
 
-		bool is_bg = pc_contains(&pc, "&");
-
 		for (int i = 0; i < pc.size; i++) {
-			//printf("[[ CMD %d ]]\n", i);
-
-			tokenlist* tokens = pc.cmds[i];			
-			/*for (int j = 0; j < tokens->size; j++) {
-				printf("token %d: (%s)\n", j, tokens->items[j]);
-			}*/
+			tokenlist* tokens = pc.cmds[i];
 
 			if (tokens->size == 0)
 				continue;
+
+			bool is_bg = tklist_contains(tokens, "&");
 			
 			// cd built-in fn
 			if(strcmp(tokens->items[0], "cd") == 0) {
@@ -130,9 +149,27 @@ int main() {
 				break;
 			}
 
+			// jobs built-in fn
+			if(strcmp(tokens->items[0], "jobs") == 0) {
+				list_jobs(&jobs);
+
+				break;
+			}
+
 			// exit built-in fn
 			if (strcmp(tokens->items[0], "exit") == 0) {
-
+				while (jobs.size > 0) {
+					int status;
+					waitpid(jobs.items[0]->pid, &status, 0);
+					if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+   						char* full_cmd = jobs.items[0]->cmd;
+						printf("%s\n", full_cmd);
+            					if (full_cmd)
+                					add_prev_cmd(full_cmd);
+					}
+					remove_job(&jobs, 0);
+				}
+				
 				handle_shell_exit();
 				should_run = false;
 				
@@ -164,7 +201,9 @@ int main() {
 			}
 
 			// Running external commands
-			if (fork() == 0) {
+			pid_t pid = fork();
+
+			if (pid == 0) {
 				if (is_piped)
 					redir_pipes(i, pc.size, old_pipe, new_pipe);
 				
@@ -173,20 +212,26 @@ int main() {
 					// can take input and output redir respectively
 					handle_redir_err(redir_io(tokens));
 				
-					char** args = make_arg_list(tokens);
-					execv(tokens->items[0], args);
+				char** args = make_arg_list(tokens);
+				execv(tokens->items[0], args);
     				fprintf(
 					stderr,
 					"\e[41;97mERROR:\e[0m command \"%s\" not found.\n",
 					tokens->items[0]
 				);
    				exit(1);
+
+			} else if (is_bg) {
+				current_jid++;
+				add_job(&jobs, current_jid, pid, input);
+				printf("[%u] %i\n", current_jid, pid);
+
 			} else {
-    				int status;
-    				waitpid(-1, &status, (is_bg) ? WNOHANG : 0);
+				int status;
+    				waitpid(pid, &status, 0);
 
 				if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-            				char* full_cmd = reconstruct_command(tokens);
+   					char* full_cmd = reconstruct_command(tokens);
             				if (full_cmd) {
                 				add_prev_cmd(full_cmd);
                 				free(full_cmd);
@@ -194,8 +239,12 @@ int main() {
 				}
 			}
 		}
+
+		free(input);
 		free_pipe_split(&pc);
 	}
+
+	free_job_list(&jobs);
 
 	return 0;
 }

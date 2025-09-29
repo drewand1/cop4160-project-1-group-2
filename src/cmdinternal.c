@@ -77,7 +77,7 @@ void handle_shell_exit(){
     } else {
         // Print last 3 commands in REVERSE order (most recent first)
         for(int i = previous_cmds.size - 1; i >= (int)(previous_cmds.size - 3); i--) {
-            printf("%zu: %s\n", i + 1, previous_cmds.items[i]);
+            printf("%d: %s\n", i + 1, previous_cmds.items[i]);
         }
     }
 
@@ -89,4 +89,13 @@ void handle_shell_exit(){
     exit(0);  // Actually exit the program
 }
 
- 
+void list_jobs(job_list* jl) {
+    if (jl->size == 0) {
+        printf("No active jobs.\n");
+    } else {
+        for (int i = 0; i < jl->size; i++) {
+            job* j = jl->items[i];
+            printf("[%u] + %d %s\n", j->job_id, j->pid, j->cmd);
+        }
+    }
+}

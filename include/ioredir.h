@@ -6,6 +6,9 @@ This header declares functions that help with IO redirection.
 
 */
 
+#ifndef IOREDIR_H
+#define IOREDIR_H
+
 #include "lexer.h"
 
 typedef enum {
@@ -33,3 +36,5 @@ void redir_pipes(int i, int pc_size, int old_pipe[2], int new_pipe[2]);
 // Handles the result of a redirect.
 // WARNING: can exit the process.
 void handle_redir_err(redir_result res);
+
+#endif

@@ -56,6 +56,7 @@ bool tklist_contains(tokenlist* toks, char* tok);
 
 // Returns true if a pipe chain contains the given token.
 bool pc_contains(pipe_chain* pc, char* tok);
+
 // This is the the argument list to free; all strings in the array
 // as well as the array itself will be deallocated.
 void free_arg_list(char** arg_list);
