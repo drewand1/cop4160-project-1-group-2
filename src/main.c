@@ -238,17 +238,6 @@ int main() {
 					}
 				}
 			}
-			if (is_piped) {
-				// Close old pipe after we're done with it
-				if (i > 0) {
-					close(old_pipe[0]);
-					close(old_pipe[1]);
-				}
-				// Close the write end of new pipe
-				if (i < pc.size - 1) {
-					close(new_pipe[1]);
-				}
-			} 
 		}
 
 		free(input);
