@@ -8,6 +8,7 @@ It has colors :)
 ## Group Members
 - **Andrew Bradley**: aeb23b@fsu.edu
   **Ryan Kurfirst**:  rsk22a@fsu.edu
+  **Daniel Halterman**: drh22a@fsu.edu
 
 ## Division of Labor
 
@@ -98,7 +99,7 @@ To build, run the following:
 make
 ```
 This will make the executable in [project folder]/bin/shell. You can directly
-execute this executable.
+execute this executable with ./bin/shell
 
 ## Development Log
 Each member records their contributions here.
@@ -132,6 +133,8 @@ Each member records their contributions here.
 | 2025-09-22 | Makefile fixes, prompt fixes, tweaks on external commands. |
 | 2025-09-24 | Fixed replace_token, free_pipe_split, and expand_tilde for memory safety, tweaks on path_search to fix extra error msg bug. |
 | 2025-09-27 | Added missing include guard in lexer.h, added missing library, added new io redirection function. |
+| 2025-09-29 | Final tests to make sure program is working properly. |
+
 
 
 ## Meetings
