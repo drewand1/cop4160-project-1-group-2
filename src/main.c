@@ -248,7 +248,7 @@ int main() {
 				if (i < pc.size - 1) {
 					close(new_pipe[1]);
 				}
-			}
+			} 
 		}
 
 		free(input);
