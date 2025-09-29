@@ -147,6 +147,7 @@ and text.
 ## Bugs
 - **Errors In Pipes**: Unexpected behavior may occur when a command in a pipe chain errors.
 - **2 commands**: If only 2 commands were run in the shell process's lifespan, the command log displayed when exit is run will only show the second.
+- **grep in pipes**: Whenever grep is in a pipe chain, it seems to output but never exit the program.
 
 ## Extra Credit
 - **Extra Credit 1**: Unlimited pipes - this shell supports an unlimited number of pipes in one command.
